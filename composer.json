@@ -1,0 +1,16 @@
+{
+    "name": "josecarlosphp/utils",
+    "description": "Common use functions, encapsulated in classes under a namespace.",
+    "keywords": [
+        "utils", "functions", "common", "use"
+    ],
+    "homepage": "https://github.com/josecarlosphp/utils",
+    "type": "library",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "José Carlos Cruz Parra",
+            "homepage": "https://josecarlosphp.com/"
+        }
+    ]
+}
