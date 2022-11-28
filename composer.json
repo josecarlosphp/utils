@@ -12,5 +12,10 @@
             "name": "José Carlos Cruz Parra",
             "homepage": "https://josecarlosphp.com/"
         }
-    ]
+    ],
+    "autoload": {
+        "psr-4": {
+            "josecarlosphp\\utils\\": "src/"
+        }
+    }
 }
