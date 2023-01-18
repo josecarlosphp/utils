@@ -325,7 +325,7 @@ abstract class Arrays
      * @param array $array
      * @return array
      */
-    static public function clone($array) //array_clone
+    static public function clon($array) //array_clone
     {
         $clon = array();
         foreach ($array as $key=>$value) {
