@@ -484,7 +484,7 @@ abstract class Xml
 
             if($xmlStr !== false && $csvfp != false)
             {
-                $xml = new SimpleXMLElement($xmlStr);
+                $xml = new \SimpleXMLElement($xmlStr);
 
                 if(is_array($elementTag))
                 {
@@ -743,7 +743,7 @@ abstract class Xml
     static public function xmlfile2header($xmlpath, $elementTag) //xmlfile2cabecera
     {
         if (($xmlStr = file_get_contents($xmlpath)) !== false) {
-            $xml = new SimpleXMLElement($xmlStr);
+            $xml = new \SimpleXMLElement($xmlStr);
 
             if (is_array($elementTag)) {
                 $aux = $xml;
