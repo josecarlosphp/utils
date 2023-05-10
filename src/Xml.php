@@ -577,11 +577,7 @@ abstract class Xml
                                         $sep2 = '';
                                         foreach($val as $str)
                                         {
-                                            if(is_object($str))
-                                            {
-                                                //TODO:
-                                            }
-                                            else
+                                            if(is_string($str) || is_object($str))
                                             {
                                                 switch($xmlTo)
                                                 {
