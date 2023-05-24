@@ -26,6 +26,23 @@ namespace josecarlosphp\utils;
 abstract class Xml
 {
     /**
+     * Tries to load an XML string an return errors if found.
+     * Returns array of \libXMLError objects.
+     *
+     * @param string $xml
+     * @return array
+     */
+    static public function getXmlErrors($xml)
+    {
+        libxml_use_internal_errors(true);
+
+        $doc = new DOMDocument('1.0', 'utf-8');
+        $doc->loadXML($xml);
+
+        return libxml_get_errors();
+    }
+
+    /**
      * Converts XML to array.
      *
      * @param string $url
