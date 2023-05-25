@@ -42,6 +42,20 @@ abstract class Xml
         return libxml_get_errors();
     }
 
+    static public function checkXml($xml, $xmlpath='')
+    {
+        $errors = self::getXmlErrors($xml);
+
+        if (!empty($errors)) {
+            $error = $errors[0];
+            if ($error->level >= LIBXML_ERR_FATAL) {
+                throw new ErrorException($error->message, $error->code, E_ERROR, $xmlpath, $error->line);
+            }
+        }
+
+        return true;
+    }
+
     /**
      * Converts XML to array.
      *
@@ -499,52 +513,33 @@ abstract class Xml
             $xmlStr = file_get_contents($xmlpath);
             $csvfp = fopen($csvpath, 'w');
 
-            if($xmlStr !== false && $csvfp != false)
-            {
-                $errors = self::getXmlErrors($xmlStr);
-
-                if (!empty($errors)) {
-                    $error = $errors[0];
-                    if ($error->level >= LIBXML_ERR_FATAL) {
-                        throw new ErrorException($error->message, $error->code, E_ERROR, $xmlpath, $error->line);
-                    }
-                }
-
+            if ($xmlStr !== false && $csvfp != false && self::checkXml($xmlStr, $xmlpath)) {
                 $xml = new \SimpleXMLElement($xmlStr);
 
-                if(is_array($elementTag))
-                {
+                if (is_array($elementTag)) {
                     $aux = $xml;
-                    foreach($elementTag as $tag)
-                    {
+                    foreach ($elementTag as $tag) {
                         $aux = $aux->$tag;
                     }
-                }
-                else
-                {
+                } else {
                     $aux = $xml->$elementTag;
                 }
 
                 //printf('<pre>$xml = %s</pre>', var_export($xml, true));
 
-                if(empty($fieldsTags))
-                {
+                if (empty($fieldsTags)) {
                     $fieldsTags = isset($aux[0]) && is_object($aux[0]) ? array_keys(get_object_vars($aux[0])) : array();
                 }
 
-                if($tagComb)
-                {
-                    foreach($fieldsTags as $key=>$tag)
-                    {
-                        if($tag == $tagComb)
-                        {
+                if ($tagComb) {
+                    foreach ($fieldsTags as $key=>$tag) {
+                        if ($tag == $tagComb) {
                             unset($fieldsTags[$key]);
                             break;
                         }
                     }
 
-                    foreach($fieldsTagsComb as $field)
-                    {
+                    foreach ($fieldsTagsComb as $field) {
                         $fieldsTags[] = $field;
                     }
                 }
@@ -553,63 +548,46 @@ abstract class Xml
 
                 fputcsv($csvfp, $fieldsTags, $delimiter, $enclosure);
 
-                foreach($aux as $item)
-                {
+                foreach ($aux as $item) {
                     $data = array();
                     $faltan = array();
 
-                    if($tagComb)
-                    {
+                    if ($tagComb) {
                         $data[$tagComb] = array();
 
-                        if(isset($item->$tagComb))
-                        {
+                        if (isset($item->$tagComb)) {
                             $vars = get_object_vars($item->$tagComb);
 
-                            foreach($vars as $i=>$val)
-                            {
-                                if(is_object($val))
-                                {
+                            foreach ($vars as $i=>$val) {
+                                if (is_object($val)) {
                                     $val = array($val);
                                 }
 
-                                foreach($val as $obj)
-                                {
+                                foreach ($val as $obj) {
                                     $data[$tagComb][] = get_object_vars($obj);
                                 }
                             }
                         }
                     }
 
-                    foreach($fieldsTags as $key)
-                    {
-                        if(isset($item->$key))
-                        {
+                    foreach ($fieldsTags as $key) {
+                        if (isset($item->$key)) {
                             $vars = get_object_vars($item->$key);
 
-                            if(empty($vars) || (phpversion() >= '7.2' && count($vars) == 1 && array_key_exists(0, $vars)))
-                            {
+                            if (empty($vars) || (phpversion() >= '7.2' && count($vars) == 1 && array_key_exists(0, $vars))) {
                                 $data[$key] = $trim ? trim((string)$item->$key) : (string)$item->$key;
-                            }
-                            else
-                            {
+                            } else {
                                 $data[$key] = '';
                                 $alFinal = '';
                                 $sep = '';
-                                foreach($vars as $i=>$val)
-                                {
-                                    if(is_array($val))
-                                    {
+                                foreach ($vars as $i=>$val) {
+                                    if (is_array($val)) {
                                         $sep2 = '';
-                                        foreach($val as $str)
-                                        {
-                                            if(is_string($str) || is_object($str))
-                                            {
-                                                switch($xmlTo)
-                                                {
+                                        foreach ($val as $str) {
+                                            if (is_string($str) || is_object($str)) {
+                                                switch ($xmlTo) {
                                                     case 'html_ul':
-                                                        if($data[$key] == '')
-                                                        {
+                                                        if ($data[$key] == '') {
                                                             $data[$key] = "<ul>\n";
                                                             $alFinal = "\n</ul>";
                                                         }
@@ -626,14 +604,10 @@ abstract class Xml
                                         }
 
                                         break; //Sólo cojo el primero (no espero más)
-                                    }
-                                    else
-                                    {
-                                        switch($xmlTo)
-                                        {
+                                    } else {
+                                        switch ($xmlTo) {
                                             case 'html_ul':
-                                                if($data[$key] == '')
-                                                {
+                                                if ($data[$key] == '') {
                                                     $data[$key] = "<ul>\n";
                                                     $alFinal = "\n</ul>";
                                                 }
@@ -647,22 +621,18 @@ abstract class Xml
                                         }
                                         $sep = "\n";
 
-                                        if(!isset($item->$i) && in_array($i, $fieldsTags))
-                                        {
+                                        if (!isset($item->$i) && in_array($i, $fieldsTags)) {
                                             $data[$i] = $val;
                                             unset($faltan[$i]);
                                         }
                                     }
                                 }
 
-                                if($alFinal)
-                                {
+                                if ($alFinal) {
                                     $data[$key] .= $alFinal;
                                 }
                             }
-                        }
-                        elseif(!isset($data[$key]))
-                        {
+                        } elseif (!isset($data[$key])) {
                             $data[$key] = '';
                             $faltan[$key] = $key;
                         }
@@ -670,68 +640,46 @@ abstract class Xml
 
                     //echo '<pre>$data = '.var_export($data, true).'</pre>';
 
-                    if($tagComb)
-                    {
-                        if(empty($data[$tagComb]))
-                        {
+                    if ($tagComb) {
+                        if (empty($data[$tagComb])) {
                             unset($data[$tagComb]);
 
                             //Añadir campos combinación (vacíos)
-                            if(empty($fieldsTagsComb))
-                            {
-                                if(empty($faltan))
-                                {
+                            if (empty($fieldsTagsComb)) {
+                                if (empty($faltan)) {
                                     //Nada
-                                }
-                                else
-                                {
-                                    foreach($faltan as $field)
-                                    {
+                                } else {
+                                    foreach ($faltan as $field) {
                                         $data[$field] = '';
                                     }
                                 }
-                            }
-                            else
-                            {
-                                foreach($fieldsTagsComb as $field)
-                                {
+                            } else {
+                                foreach ($fieldsTagsComb as $field) {
                                     $data[$field] = '';
                                 }
                             }
 
                             fputcsv($csvfp, $data, $delimiter, $enclosure);
-                        }
-                        else
-                        {
+                        } else {
                             //echo '<pre>$data[$tagComb] = '.var_export($data[$tagComb], true).'</pre>';
 
-                            foreach($data[$tagComb] as $combinacion)
-                            {
+                            foreach ($data[$tagComb] as $combinacion) {
                                 $dataComb = $data;
                                 unset($dataComb[$tagComb]);
 
                                 //Añadir campos combinación
-                                if(empty($fieldsTagsComb))
-                                {
-                                    if(empty($faltan))
-                                    {
-                                        foreach($combinacion as $key=>$val)
-                                        {
+                                if (empty($fieldsTagsComb)) {
+                                    if (empty($faltan)) {
+                                        foreach ($combinacion as $key=>$val) {
                                             $dataComb[$key] = $val;
                                         }
-                                    }
-                                    else
-                                    {
-                                        foreach($faltan as $field)
-                                        {
+                                    } else {
+                                        foreach ($faltan as $field) {
                                             $dataComb[$field] = isset($combinacion[$field]) ? $combinacion[$field] : '';
                                         }
                                     }
-                                }
-                                else
-                                {
-                                    foreach($fieldsTagsComb as $field)
-                                    {
+                                } else {
+                                    foreach ($fieldsTagsComb as $field) {
                                         $dataComb[$field] = isset($combinacion[$field]) ? $combinacion[$field] : '';
                                     }
                                 }
@@ -739,32 +687,27 @@ abstract class Xml
                                 fputcsv($csvfp, $dataComb, $delimiter, $enclosure);
                             }
                         }
-                    }
-                    else
-                    {
+                    } else {
                         fputcsv($csvfp, $data, $delimiter, $enclosure);
                     }
                 }
+            } else {
+                trigger_error('No $xmlStr or no $csvfp', E_USER_ERROR);
             }
 
-            if(is_resource($csvfp))
-            {
+            if (is_resource($csvfp)) {
                 fclose($csvfp);
             }
-        }
-        elseif($tagComb)
-        {
+        } elseif($tagComb) {
             trigger_error('Class SimpleXMLElement not found', E_USER_ERROR);
-        }
-        else
-        {
+        } else {
             self::xmlfile2csvfile($xmlpath, $csvpath, is_array($elementTag) ? $elementTag[sizeof($elementTag)-1] : $elementTag, $fieldsTags, $delimiter, $enclosure);
         }
     }
 
     static public function xmlfile2header($xmlpath, $elementTag) //xmlfile2cabecera
     {
-        if (($xmlStr = file_get_contents($xmlpath)) !== false) {
+        if (($xmlStr = file_get_contents($xmlpath)) !== false && self::checkXml($xmlStr)) {
             $xml = new \SimpleXMLElement($xmlStr);
 
             if (is_array($elementTag)) {
