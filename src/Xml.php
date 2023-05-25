@@ -36,7 +36,7 @@ abstract class Xml
     {
         libxml_use_internal_errors(true);
 
-        $doc = new DOMDocument('1.0', 'utf-8');
+        $doc = new \DOMDocument('1.0', 'utf-8');
         $doc->loadXML($xml);
 
         return libxml_get_errors();
