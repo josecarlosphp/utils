@@ -49,7 +49,7 @@ abstract class Xml
         if (!empty($errors)) {
             $error = $errors[0];
             if ($error->level >= LIBXML_ERR_FATAL) {
-                throw new ErrorException($error->message, $error->code, E_ERROR, $xmlpath, $error->line);
+                throw new \ErrorException($error->message, $error->code, E_ERROR, $xmlpath, $error->line);
             }
         }
 
