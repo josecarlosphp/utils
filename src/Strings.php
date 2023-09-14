@@ -157,18 +157,13 @@ abstract class Strings
     static public function cogerTrozo($str, $pre, $sig, $inclusive = false) //cogerTrozo
     {
         if (($pos = mb_strpos($str, $pre)) !== false) {
-            if (!$inclusive) {
-                $pos += mb_strlen($pre);
-            }
+            $pos += mb_strlen($pre);
             $str = mb_substr($str, $pos);
 
             if (($pos = mb_strpos($str, $sig)) !== false) {
-                if ($inclusive) {
-                    $pos += mb_strlen($sig);
-                }
                 $str = mb_substr($str, 0, $pos);
 
-                return $str;
+                return $inclusive ? $pre . $str . $sig : $str;
             }
         }
 
