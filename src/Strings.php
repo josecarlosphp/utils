@@ -154,16 +154,25 @@ abstract class Strings
         return $aux;
     }
 
-    static public function cogerTrozo($str, $pre, $sig) //cogerTrozo
+    static public function cogerTrozo($str, $pre, $sig, $inclusive = false) //cogerTrozo
     {
-        /*
-        $str = substr($str, strpos($str, $pre) + strlen($pre));
-        $str = substr($str, 0, strpos($str, $sig));
-        */
-        $str = mb_substr($str, mb_strpos($str, $pre) + mb_strlen($pre));
-        $str = mb_substr($str, 0, mb_strpos($str, $sig));
+        if (($pos = mb_strpos($str, $pre)) !== false) {
+            if (!$inclusive) {
+                $pos += mb_strlen($pre);
+            }
+            $str = mb_substr($str, $pos);
 
-        return $str;
+            if (($pos = mb_strpos($str, $sig)) !== false) {
+                if ($inclusive) {
+                    $pos += mb_strlen($sig);
+                }
+                $str = mb_substr($str, 0, $pos);
+
+                return $str;
+            }
+        }
+
+        return '';
     }
 
     static public function quitarTrozo($str, $pre, $sig, $multi=true) //quitarTrozo
