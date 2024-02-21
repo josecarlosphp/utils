@@ -265,7 +265,7 @@ abstract class Images
                 $source = imagecreatefromstring(file_get_contents($imagefile));
                 $thumb = imagecreatetruecolor($dst_w, $dst_h);
 
-                switch ($extForzada ? $extForzada : getExtension($newname)) {
+                switch ($extForzada ? $extForzada : Files::getExtension($newname)) {
                     case 'png':
                         imagealphablending($thumb, false);
                         imagesavealpha($thumb, true);
