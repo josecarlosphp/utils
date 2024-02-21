@@ -43,7 +43,7 @@ abstract class Images
         }
         else
         {
-            $newwidth = $thumbwidth;
+            $newwidth = (int)$thumbwidth;
         }
         $newheight = (int)(($height * $newwidth) / $width);
         $thumb = imagecreatetruecolor($newwidth,$newheight);
@@ -173,12 +173,12 @@ abstract class Images
         if ($width > 0 && $height > 0) {
 
             if (is_array($size)) {
-                $newwidth = $size[0];
-                $newheight = $size[1];
+                $newwidth = (int)$size[0];
+                $newheight = (int)$size[1];
 
                 if (!$newwidth && !$newheight) {
-                    $newwidth = $width;
-                    $newheight = $height;
+                    $newwidth = (int)$width;
+                    $newheight = (int)$height;
                 } elseif(!$newwidth) {
                     $newwidth = (int)(($width * $newheight) / $height);
                 } elseif(!$newheight) {
@@ -187,11 +187,11 @@ abstract class Images
             } else {
                 if ($width >= $height) {
                     //Redimensionar conforme al ancho
-                    $newwidth = $size;
+                    $newwidth = (int)$size;
                     $newheight = (int)(($height * $newwidth) / $width);
                 } else {
                     //Redimensionar conforme al alto
-                    $newheight = $size;
+                    $newheight = (int)$size;
                     $newwidth = (int)(($width * $newheight) / $height);
                 }
             }
