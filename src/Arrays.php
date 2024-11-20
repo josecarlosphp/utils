@@ -598,7 +598,7 @@ abstract class Arrays
         return false;
     }
 
-    function reverse_special($arr, $indices=null)
+    static public function reverse_special($arr, $indices=null)
     {
         if (is_null($indices)) {
             $indices = array_keys($arr);
