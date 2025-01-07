@@ -16,7 +16,7 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
  * @see         https://github.com/josecarlosphp/utils
- * @copyright   2022 José Carlos Cruz Parra
+ * @copyright   2022-2025 José Carlos Cruz Parra
  * @license     https://www.gnu.org/licenses/gpl.txt GPL version 3
  * @desc        Common use functions for working with SQL, encapsulated in a class.
  */
