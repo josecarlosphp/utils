@@ -31,7 +31,7 @@ abstract class Sql
      * @return string
      * @param array $data
      * @param string $table
-     * @param bool $onDuplicateKeyUpdate
+     * @param bool|array $onDuplicateKeyUpdate
      */
     static public function buildQuery_Insert($data, $table, $onDuplicateKeyUpdate=false) //buildQuery_Insert
     {
@@ -63,7 +63,16 @@ abstract class Sql
 
         if ($onDuplicateKeyUpdate) {
             $query .= " ON DUPLICATE KEY UPDATE ";
-            $keys = array_keys($data);
+            if (is_array($onDuplicateKeyUpdate)) {
+                $keys = array();
+                foreach ($onDuplicateKeyUpdate as $key) {
+                    if (array_key_exists($key, $data)) {
+                        $keys[] = $key;
+                    }
+                }
+            } else {
+                $keys = array_keys($data);
+            }
             for ($c=0,$size; $c<$size; $c++) {
                 if ($c > 0) {
                     $query .= ", ";
