@@ -37,7 +37,7 @@ abstract class Sql
     {
         $query = "INSERT INTO `" . $table . "`(";
         $keys = array_keys($data);
-        for ($c=0,$size=sizeof($data); $c<$size; $c++)  {
+        for ($c=0,$size=count($data); $c<$size; $c++)  {
             if (is_array($data[$keys[$c]]) || is_object($data[$keys[$c]])) {
                 $data[$keys[$c]] = serialize($data[$keys[$c]]);
             } elseif($data[$keys[$c]] === true) {
@@ -73,7 +73,7 @@ abstract class Sql
             } else {
                 $keys = array_keys($data);
             }
-            for ($c=0,$size; $c<$size; $c++) {
+            for ($c=0,$size=count($keys); $c<$size; $c++) {
                 if ($c > 0) {
                     $query .= ", ";
                 }
