@@ -727,12 +727,28 @@ abstract class Internet
 
     static public function utf8_encode_once($str) //utf8_encode_once
     {
-        return self::is_utf8($str) ? $str : utf8_encode($str);
+        if (!self::is_utf8($str)) {
+            if (version_compare(PHP_VERSION, '8.2.0') >= 0) {
+                return mb_convert_encoding($str, 'UTF-8', mb_list_encodings());
+            }
+
+            return utf8_encode($str);
+        }
+
+        return $str;
     }
 
     static public function utf8_decode_once($str) //utf8_decode_once
     {
-        return self::is_utf8($str) ? utf8_decode($str) : $str;
+        if (self::is_utf8($str)) {
+            if (version_compare(PHP_VERSION, '8.2.0') >= 0) {
+                return mb_convert_encoding($str, 'ISO-8859-1', 'UTF-8');
+            }
+
+            return utf8_decode($str);
+        }
+
+        return $str;
     }
 
     static public function is_utf8($str) //is_utf8
