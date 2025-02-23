@@ -29,15 +29,33 @@ abstract class Sql
 {
     /**
      * @return string
-     * @param array $data
+     * @param array $datas
      * @param string $table
      * @param bool|array $onDuplicateKeyUpdate
      */
-    static public function buildQuery_Insert($data, $table, $onDuplicateKeyUpdate=false) //buildQuery_Insert
+    static public function buildQuery_InsertMulti($datas, $table, $onDuplicateKeyUpdate=false)
     {
-        $query = "INSERT INTO `" . $table . "`(";
+        $query = "INSERT INTO `" . $table . "` " . self::data2keys($datas[0]) . " VALUES ";
+
+        $sep = '';
+        foreach ($datas as $data) {
+            $query .= $sep . self::data2values($data);
+            $sep = ', ';
+        }
+
+        return $query . self::data2onDuplicate($data, $onDuplicateKeyUpdate) . ';';
+    }
+
+    static protected function data2keys($data)
+    {
+        return '(`' . implode('`, `', array_keys($data)). '`)';
+    }
+
+    static protected function data2values($data)
+    {
+        $query = '(';
         $keys = array_keys($data);
-        for ($c=0,$size=count($data); $c<$size; $c++)  {
+        for ($c=0,$size=count($data); $c<$size; $c++) {
             if (is_array($data[$keys[$c]]) || is_object($data[$keys[$c]])) {
                 $data[$keys[$c]] = serialize($data[$keys[$c]]);
             } elseif($data[$keys[$c]] === true) {
@@ -49,17 +67,51 @@ abstract class Sql
             if ($c > 0) {
                 $query .= ', ';
             }
-            $query .= "`".$keys[$c]."`";
-        }
-        $query .= ") VALUES(";
-        for ($c=0; $c<$size; $c++) {
-            if ($c > 0) {
-                $query .= ', ';
-            }
             $query .= is_null($data[$keys[$c]]) ? 'NULL' : sprintf("'%s'", addcslashes($data[$keys[$c]], "\\'"));
         }
 
-        $query .= ")";
+        return $query . ')';
+    }
+
+    static protected function data2onDuplicate($data, $onDuplicateKeyUpdate=false)
+    {
+        if ($onDuplicateKeyUpdate) {
+            $query = "ON DUPLICATE KEY UPDATE ";
+
+            if (is_array($onDuplicateKeyUpdate)) {
+                $keys = array();
+                foreach ($onDuplicateKeyUpdate as $key) {
+                    if (array_key_exists($key, $data)) {
+                        $keys[] = $key;
+                    }
+                }
+            } else {
+                $keys = array_keys($data);
+            }
+
+            for ($c=0,$size=count($keys); $c<$size; $c++) {
+                if ($c > 0) {
+                    $query .= ", ";
+                }
+                $query .= sprintf("`%s` = VALUES(`%s`)", $keys[$c], $keys[$c]);
+            }
+
+            return $query;
+        }
+
+        return '';
+    }
+    /**
+     * @return string
+     * @param array $data
+     * @param string $table
+     * @param bool|array $onDuplicateKeyUpdate
+     */
+    static public function buildQuery_Insert($data, $table, $onDuplicateKeyUpdate=false) //buildQuery_Insert
+    {
+        $query = "INSERT INTO `" . $table . "` " . self::data2keys($data)
+            . " VALUES " . self::data2values($data);
+            //. self::data2onDuplicate($data, $onDuplicateKeyUpdate) . ';';
 
         if ($onDuplicateKeyUpdate) {
             $query .= " ON DUPLICATE KEY UPDATE ";
@@ -82,7 +134,7 @@ abstract class Sql
             }
         }
 
-        return $query.';';
+        return $query . ';';
     }
     /**
      * @return string
@@ -124,7 +176,7 @@ abstract class Sql
      */
     static public function buildQuery_Delete($table, $ids=null) //buildQuery_Delete
     {
-        return "DELETE FROM `" . $table . "`" . DbConnection::ids2where($ids) . ';';
+        return "DELETE FROM `" . $table . "` " . DbConnection::ids2where($ids) . ';';
     }
     /**
      * Une una condición where y un filtro que puede contener where, order by,...
