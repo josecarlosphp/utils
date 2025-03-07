@@ -56,14 +56,7 @@ abstract class Sql
         $query = '(';
         $keys = array_keys($data);
         for ($c=0,$size=count($data); $c<$size; $c++) {
-            if (is_array($data[$keys[$c]]) || is_object($data[$keys[$c]])) {
-                $data[$keys[$c]] = serialize($data[$keys[$c]]);
-            } elseif($data[$keys[$c]] === true) {
-                $data[$keys[$c]] = 1;
-            } elseif($data[$keys[$c]] === false) {
-                $data[$keys[$c]] = 0;
-            }
-
+            $data[$keys[$c]] = self::prepareValue($data[$keys[$c]]);
             if ($c > 0) {
                 $query .= ', ';
             }
@@ -71,6 +64,19 @@ abstract class Sql
         }
 
         return $query . ')';
+    }
+    
+    static protected function prepareValue($val)
+    {
+        if (is_array($val) || is_object($val)) {
+            return serialize($val);
+        } elseif ($val === true) {
+            return 1;
+        } elseif ($val === false) {
+            return 0;
+        }
+        
+        return $val;
     }
 
     static protected function data2onDuplicate($data, $onDuplicateKeyUpdate=false)
@@ -126,6 +132,7 @@ abstract class Sql
                 $keys = array_keys($data);
             }
             for ($c=0,$size=count($keys); $c<$size; $c++) {
+                $data[$keys[$c]] = self::prepareValue($data[$keys[$c]]);
                 if ($c > 0) {
                     $query .= ", ";
                 }
@@ -152,14 +159,7 @@ abstract class Sql
         $query = "UPDATE `" . $table . "` SET ";
         $keys = array_keys($data);
         for ($c=0,$size=sizeof($data); $c<$size; $c++) {
-            if (is_array($data[$keys[$c]]) || is_object($data[$keys[$c]])) {
-                $data[$keys[$c]] = serialize($data[$keys[$c]]);
-            } elseif ($data[$keys[$c]] === true) {
-                $data[$keys[$c]] = 1;
-            } elseif ($data[$keys[$c]] === false) {
-                $data[$keys[$c]] = 0;
-            }
-
+            $data[$keys[$c]] = self::prepareValue($data[$keys[$c]]);
             if ($c > 0) {
                 $query .= ', ';
             }
