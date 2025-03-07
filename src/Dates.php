@@ -25,6 +25,56 @@ namespace josecarlosphp\utils;
 
 abstract class Dates
 {
+    protected static $defaultLang = 'es';
+    protected static $langs = array(
+        'es' => array(
+            'Y' => 'año',
+            'Ys' => 'años',
+            'm' => 'mes',
+            'ms' => 'meses',
+            'd' => 'día',
+            'ds' => 'días',
+            'H' => 'hora',
+            'Hs' => 'horas',
+            'i' => 'minuto',
+            'is' => 'minutos',
+            's' => 'segundo',
+            'ss' => 'segundos',
+        ),
+        'en' => array(
+            'Y' => 'year',
+            'Ys' => 'years',
+            'm' => 'month',
+            'ms' => 'months',
+            'd' => 'day',
+            'ds' => 'days',
+            'H' => 'hour',
+            'Hs' => 'hours',
+            'i' => 'minute',
+            'is' => 'minutes',
+            's' => 'second',
+            'ss' => 'seconds',
+        ),
+    );
+
+    static public function defaultLang($lang = null)
+    {
+        if (!is_null($lang) && in_array($lang, self::$langs)) {
+            self::$defaultLang = $lang;
+        }
+
+        return self::$defaultLang;
+    }
+
+    static public function l($q, $lang = null)
+    {
+        if (is_null($lang) || !in_array($lang, self::$langs)) {
+            $lang = self::$defaultLang;
+        }
+
+        return isset(self::$langs[$lang][$q]) ? self::$langs[$lang][$q] : false;
+    }
+
     /**
      * Calculates age in years for a given date.
      *
@@ -168,19 +218,19 @@ abstract class Dates
     static public function getNumDaysOfMonth($month, $year) //getNumDaysOfMonth
     {
         $days = array(
-            1=>31,
-            2=>28,
-            3=>31,
-            4=>30,
-            5=>31,
-            6=>30,
-            7=>31,
-            8=>31,
-            9=>30,
-            10=>31,
-            11=>30,
-            12=>31,
-            );
+            1 => 31,
+            2 => 28,
+            3 => 31,
+            4 => 30,
+            5 => 31,
+            6 => 30,
+            7 => 31,
+            8 => 31,
+            9 => 30,
+            10 => 31,
+            11 => 30,
+            12 => 31,
+        );
 
         $month = intval($month);
 
@@ -344,31 +394,51 @@ abstract class Dates
         $minutos = floor($time / 60);
         $time -= ($minutos * 60);
 
-        return array('d'=>$days, 'H'=>$horas, 'i'=>$minutos, 's'=>$time);
+        return array(
+            'd' => $days,
+            'H' => $horas,
+            'i' => $minutos,
+            's' => $time,
+        );
     }
 
-    static public function tiempo2str($tiempo) //tiempo2str
+    static public function tiempo2str($tiempo, $lang = null) //tiempo2str
     {
         $r = '';
         $sep = '';
 
         if ($tiempo['d'] > 0) {
-            $r .= sprintf('%u %s', $tiempo['d'], $tiempo['d'] == 1 ? 'día' : 'días');
+            $r .= sprintf('%u %s', $tiempo['d'], self::l($tiempo['d'] == 1 ? 'd' : 'ds', $lang));
             $sep = ', ';
         }
 
         if ($tiempo['d'] > 0 || $tiempo['H'] > 0) {
-            $r .= sprintf('%s%u %s', $sep, $tiempo['H'], $tiempo['H'] == 1 ? 'hora' : 'horas');
+            $r .= sprintf('%s%u %s', $sep, $tiempo['H'], self::l($tiempo['H'] == 1 ? 'H' : 'Hs', $lang));
             $sep = ', ';
         }
 
         if ($tiempo['d'] > 0 || $tiempo['H'] > 0 || $tiempo['i'] > 0) {
-            $r .= sprintf('%s%u %s', $sep, $tiempo['i'], $tiempo['i'] == 1 ? 'minuto' : 'minutos');
+            $r .= sprintf('%s%u %s', $sep, $tiempo['i'], self::l($tiempo['i'] == 1 ? 'i' : 'is', $lang));
             $sep = ', ';
         }
 
-        $r .= sprintf('%s%u %s', $sep, $tiempo['s'], $tiempo['s'] == 1 ? 'segundo' : 'segundos');
+        $r .= sprintf('%s%u %s', $sep, $tiempo['s'], self::l($tiempo['s'] == 1 ? 's' : 'ss', $lang));
 
         return $r;
+    }
+
+    static public function time2str($time)
+    {
+        return self::tiempo2str(self::time2tiempo($time));
+    }
+
+    static public function dateDiff($dateIni, $dateFin, $toStr = false)
+    {
+        $timeIni = self::date2time($dateIni);
+        $timeFin = self::date2time($dateFin);
+
+        $time = $timeFin - $timeIni;
+
+        return $toStr ? self::time2str($time) : $time;
     }
 }
