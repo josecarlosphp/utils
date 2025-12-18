@@ -441,4 +441,44 @@ abstract class Dates
 
         return $toStr ? self::time2str($time) : $time;
     }
+
+    static public function isdmY($var)
+    {
+        if (is_string($var) && mb_strlen($var) == 10) {
+            $sepA = mb_substr($var, 2, 1);
+            $sepB = mb_substr($var, 5, 1);
+            if ($sepA == $sepB && in_array($sepA, array('/', '-'))) {
+                $arr = explode($sepA, $var);
+                if (count($arr) == 3
+                    && ctype_digit($arr[0]) && ctype_digit($arr[1]) && ctype_digit($arr[2])
+                    && $arr[0] > '00' && $arr[0] < '32'
+                    && $arr[1] > '00' && $arr[1] < '13'
+                    ) {
+                        return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    static public function isYmd($var)
+    {
+        if (is_string($var) && mb_strlen($var) == 10) {
+            $sepA = mb_substr($var, 4, 1);
+            $sepB = mb_substr($var, 7, 1);
+            if ($sepA == $sepB && in_array($sepA, array('/', '-'))) {
+                $arr = explode($sepA, $var);
+                if (count($arr) == 3
+                    && ctype_digit($arr[0]) && ctype_digit($arr[1]) && ctype_digit($arr[2])
+                    && $arr[2] > '00' && $arr[2] < '32'
+                    && $arr[1] > '00' && $arr[1] < '13'
+                    ) {
+                        return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }
