@@ -334,10 +334,10 @@ abstract class Internet
         $patrones[] = array('Ñ', 'N');
         $patrones[] = array('Ç', 'C');
 
-        $patrones[] = array(array('á','à','ä','â','Ã¡'), 'a');
+        $patrones[] = array(array('á','à','ä','â','Ã¡','ª'), 'a');
         $patrones[] = array(array('é','è','ë','ê','Ã©'), 'e');
         $patrones[] = array(array('í','ì','ï','î','Ã­'), 'i');
-        $patrones[] = array(array('ó','ò','ö','ô','Ã³'), 'o');
+        $patrones[] = array(array('ó','ò','ö','ô','Ã³','º'), 'o');
         $patrones[] = array(array('ú','ù','ü','û'), 'u');
         $patrones[] = array('ñ', 'n');
         $patrones[] = array('ç', 'c');
