@@ -734,13 +734,25 @@ abstract class Internet
         return utf8_encode($str);
     }
 
-    static public function utf8_encode_once($str) //utf8_encode_once
+    /**
+     * Encode value if not is UTF8 encoded.
+     * Allows array and object as parameter $var.
+     * @param mixed $var
+     * @return mixed
+     */
+    static public function utf8_encode_once($var) //utf8_encode_once
     {
-        if (!self::is_utf8($str)) {
-            return self::utf8_encode($str);
+        if (is_string($var)) {
+            if (!self::is_utf8($var)) {
+                $var = self::utf8_encode($var);
+            }
+        } elseif (is_array($var) || is_object($var)) {
+            foreach ($var as &$item) {
+                $item = self::utf8_encode_once($item);
+            }
         }
 
-        return $str;
+        return $var;
     }
 
     static public function utf8_decode($str)
@@ -752,13 +764,25 @@ abstract class Internet
         return utf8_decode($str);
     }
 
-    static public function utf8_decode_once($str) //utf8_decode_once
+    /**
+     * Decode value if is UTF8 encoded.
+     * Allows array and object as parameter $var.
+     * @param mixed $var
+     * @return mixed
+     */
+    static public function utf8_decode_once($var) //utf8_decode_once
     {
-        if (self::is_utf8($str)) {
-            return self::utf8_decode($str);
+        if (is_string($var)) {
+            if (self::is_utf8($var)) {
+                $var = self::utf8_decode($var);
+            }
+        } elseif (is_array($var) || is_object($var)) {
+            foreach ($var as &$item) {
+                $item = self::utf8_decode_once($item);
+            }
         }
 
-        return $str;
+        return $var;
     }
 
     static public function is_utf8($str) //is_utf8
