@@ -81,15 +81,16 @@ abstract class Dates
      * @param int $day
      * @param int $month
      * @param int $year
+     * @param int $timestamp
      * @return int
      */
-    static public function calculateAge($day, $month, $year) //calcularEdad
+    static public function calculateAge($day, $month, $year, $timestamp = null) //calcularEdad
     {
-        $age = date('Y') - $year - 1; //-1 porque no sé si ha cumplido años ya este año
+        $age = date('Y', $timestamp) - $year - 1; //-1 porque no sé si ha cumplido años ya este año
         if ($age >= 0)  {
-            $difMeses = date('n') - $month;
+            $difMeses = date('n', $timestamp) - $month;
             if ($difMeses == 0) {
-                return ((date('j') - $day) < 0) ? $age : ($age + 1);
+                return ((date('j', $timestamp) - $day) < 0) ? $age : ($age + 1);
             }
 
             return ($difMeses < 0) ? $age : ($age + 1);
@@ -102,13 +103,14 @@ abstract class Dates
      *
      * @param string $date
      * @param string $format
+     * @param int $timestamp
      * @return int
      */
-    static public function calculateAgeStr($date, $format='Y-m-d') //calcularEdadStr
+    static public function calculateAgeStr($date, $format='Y-m-d', $timestamp = null) //calcularEdadStr
     {
         $arr = self::breakdownDate($date, $format);
 
-        return self::calculateAge($arr[2], $arr[1], $arr[0]);
+        return self::calculateAge($arr[2], $arr[1], $arr[0], $timestamp);
     }
 
     static public function breakdownDate($date, $format='Y-m-d') //descomponerFecha
