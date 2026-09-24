@@ -728,7 +728,7 @@ abstract class Internet
     static public function utf8_encode($str)
     {
         if (version_compare(PHP_VERSION, '8.2.0') >= 0) {
-            return mb_convert_encoding($str, 'UTF-8', mb_list_encodings());
+            return mb_convert_encoding($str, 'UTF-8', array_merge(['Windows-1252', 'ISO-8859-1'], mb_list_encodings()));
         }
 
         return utf8_encode($str);
@@ -758,7 +758,7 @@ abstract class Internet
     static public function utf8_decode($str)
     {
         if (version_compare(PHP_VERSION, '8.2.0') >= 0) {
-            return mb_convert_encoding($str, 'ISO-8859-1', 'UTF-8');
+            return mb_convert_encoding($str, 'Windows-1252', 'UTF-8');
         }
 
         return utf8_decode($str);
